@@ -15,9 +15,9 @@ public:
 	~Date();
 
 	void advanceDate();
-	inline int getYear() const { return year_; }
-	inline int getMonth() const { return month_; }
-	inline int getDay() const { return day_; }
+	inline int getYear() const;
+	inline int getMonth() const;
+	inline int getDay() const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Date& date);
