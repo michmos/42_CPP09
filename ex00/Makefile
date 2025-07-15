@@ -1,15 +1,15 @@
 
-NAME	:= exec_cpp07
+NAME	:= btc
 
 SRC_DIR := src
-SRCS	:= main.cpp
+SRCS	:= main.cpp Date.cpp
 SRCS	:= $(addprefix $(SRC_DIR)/, $(SRCS))
 
 BUILD_DIR	:= .build
 OBJS		:= $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 
 CC		:= c++
-CFLAGS	:= -Wall -Wextra -Werror -std=c++11 -MMD -fsanitize=address
+CFLAGS	:= -Wall -Wextra -Werror -std=c++17 -MMD -fsanitize=address
 LDFLAGS	:= -fsanitize=address
 DEBUG	?= 0
 ifeq ($(DEBUG), 1)
