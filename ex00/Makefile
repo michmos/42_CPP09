@@ -2,7 +2,7 @@
 NAME	:= btc
 
 SRC_DIR := src
-SRCS	:= main.cpp Date.cpp
+SRCS	:= main.cpp Date.cpp BtcConverter.cpp
 SRCS	:= $(addprefix $(SRC_DIR)/, $(SRCS))
 
 BUILD_DIR	:= .build
