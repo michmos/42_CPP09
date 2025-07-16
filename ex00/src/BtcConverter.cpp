@@ -6,32 +6,34 @@
 #include <optional>
 #include <regex>
 #include <stdexcept>
-#include <system_error>
+#include "../inc/Date.hpp"
 
 
 BtcConverter::BtcConverter(const std::string& pathToCsv) {
+	// open csv file
 	std::ifstream	csvFile(pathToCsv);
-	
 	if (csvFile.fail()) {
 		throw std::invalid_argument("Couldn't open file: " + pathToCsv + ": " + strerror(errno));
 	}
 
+	// construct map of exchange rates from csv file
 	std::string	line;
 	for (std::size_t lineNbr = 0; std::getline(csvFile, line); ++lineNbr) {
-		if (lineNbr == 0) { 
-			continue; 
-		}
+		// skip header line
+		if (lineNbr == 0) { continue; }
 
 		std::smatch match;
 		bool lineIsValid = false;
 		if (std::regex_match(line, match, std::regex("(" REGEX_DATE "),(" REGEX_NUMBER ")"))) {
 			std::string date = match[1];
+			std::string exchangeRate = match[2];
 			if (lineNbr == 1) {
 				oldestDate_ = date;
 			}
+
 			try {
-				float value = std::stof(match[2]);
-				exchangeRate_[date] = value;
+				float exRate = std::stof(exchangeRate);
+				exchangeRate_[date] = exRate;
 				lineIsValid = true;
 			} catch (std::exception&) {}
 		}
