@@ -6,10 +6,13 @@
 #include <regex>
 #include <stdexcept>
 
+#define RED "\033[31m"
+#define RESET "\033[0m"
+
 #define CSV_PATH "data.csv"
 
 void printInputError(size_t lineNbr, const std::string& str) {
-	std::cerr << "Error in line: " << lineNbr << ": " << str << std::endl;
+	std::cerr << RED << "Error in line: " << lineNbr << ": " << str << RESET << std::endl;
 }
 
 float getValue(const std::string& validationDate, const std::string& amount) {
@@ -37,7 +40,7 @@ float getValue(const std::string& validationDate, const std::string& amount) {
 
 int main(int argc, char* argv[]) {
 	if (argc != 2) {
-		std::cerr <<"Usage: ./btc <pathToInputFile>" << std::endl;
+		std::cerr << RED <<"Usage: ./btc <pathToInputFile>" << RESET << std::endl;
 		return 1;
 	}
 	
@@ -45,8 +48,7 @@ int main(int argc, char* argv[]) {
 		// open input file
 		std::ifstream	inputFile(argv[1]);
 		if (inputFile.fail()) {
-			std::cerr << "Could not open input file: " << strerror(errno) << std::endl;
-			return 1;
+			throw std::invalid_argument("Couldn't open file: " + std::string(argv[1]) + ": " + strerror(errno));
 		}
 
 		std::string line;
@@ -69,7 +71,7 @@ int main(int argc, char* argv[]) {
 			}
 		}
 	} catch (std::exception& e)  {
-		std::cerr << e.what() << std::endl;
+		std::cerr << RED << e.what() << RESET << std::endl;
 		return (1);
 	}
 

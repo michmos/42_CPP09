@@ -8,6 +8,8 @@
 #include <stdexcept>
 #include "../inc/Date.hpp"
 
+#define RED "\033[31m"
+#define RESET "\033[0m"
 
 BtcConverter::BtcConverter(const std::string& pathToCsv) {
 	// open csv file
@@ -38,7 +40,7 @@ BtcConverter::BtcConverter(const std::string& pathToCsv) {
 			} catch (std::exception&) {}
 		}
 		if (!lineIsValid) {
-			std::cerr << "Invalid line in csv: line " << lineNbr << ": " << line << std::endl;
+			std::cerr << RED << "Invalid line in csv: line " << lineNbr << ": " << line << RESET << std::endl;
 		}
 	}
 }
