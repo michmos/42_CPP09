@@ -19,6 +19,7 @@ public:
 	int getYear() const;
 	int getMonth() const;
 	int getDay() const;
+	std::string getDate() const;
 };
 
 std::ostream& operator<<(std::ostream& os, const Date& date);

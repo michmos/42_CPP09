@@ -99,3 +99,11 @@ int Date::getYear() const { return year_; }
 int Date::getMonth() const { return month_; }
 int Date::getDay() const { return day_; }
 
+std::string Date::getDate() const {
+	std::ostringstream oss;
+	oss << year_
+		<< "-" << std::setw(2) << std::setfill('0') << month_
+		<< "-" << std::setw(2) << std::setfill('0') << day_;
+	return oss.str();
+}
+
