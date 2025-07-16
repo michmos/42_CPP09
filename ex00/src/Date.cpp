@@ -1,9 +1,18 @@
 #include "../inc/Date.hpp"
+#include <iomanip>
 #include <iostream>
 #include <optional>
 #include <regex>
+#include <sstream>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
+
+static const std::unordered_map<int, int> g_daysInMonth = {
+	{1, 31}, {2, 28}, {3, 31}, {4, 30},
+	{5, 31}, {6, 30}, {7, 31}, {8, 31},
+	{9, 30}, {10, 31}, {11, 30}, {12, 31}
+};
 
 static bool isLeapYear(int year) {
 	// special rules for centuries
@@ -27,15 +36,14 @@ static std::optional<std::string>	validityCheck(unsigned int year, unsigned int 
 		} else if (day > 29){
 			return ("february doesn't have " + std::to_string(day) + " days");
 		}
-	} else if (day == 31 && ((month < 8 && month % 2 == 0)
-							|| (month >= 8 && month % 2 == 1))) {
+	} else if (day > g_daysInMonth.at(month)) {
 			return ("month " + std::to_string(month) + " doesn't have 31 days");
 	}
 	return (std::nullopt);
 }
 
 Date::Date(const std::string& date) {
-	if (!std::regex_match(date, std::regex("[0-9]{4}(-[0-9]{2}){2}"))) {
+	if (!std::regex_match(date, std::regex(REGEX_DATE))) {
 		throw std::invalid_argument("invalid date format");
 	}
 	try {
@@ -68,21 +76,18 @@ Date::~Date() {
 }
 
 
-void Date::advanceDate() {
-	auto errMsg = validityCheck(year_, month_, day_ + 1);
-	if (!errMsg) {
-		day_++;
-		return;
+std::string Date::decrementDate() {
+	if (day_ > 1) { 			// same month
+		day_--;
+	} else if (month_ > 1) {	// last mont
+		month_--;
+		day_ = g_daysInMonth.at(month_);
+	} else {					// last year
+		year_--;
+		month_ = 12;
+		day_ = 31;
 	}
-	errMsg = validityCheck(year_, month_ + 1, 1);
-	if (!errMsg) {
-		month_++;
-		day_ = 1;
-		return;
-	}
-	year_++;
-	month_ = 1;
-	day_ = 1;
+	return (getDate());
 }
 
 std::ostream& operator<<(std::ostream& os, const Date& date) {

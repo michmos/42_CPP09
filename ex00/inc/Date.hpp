@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#define REGEX_DATE "[0-9]{4}(?:-[0-9]{2}){2}"
 
 class Date {
 private:
@@ -14,7 +15,7 @@ public:
 	Date& operator=(const Date& toAsgn);
 	~Date();
 
-	void advanceDate();
+	std::string decrementDate();
 	int getYear() const;
 	int getMonth() const;
 	int getDay() const;
