@@ -23,23 +23,22 @@ static bool isLeapYear(int year) {
 }
 
 // checks whether the date exists
-static std::optional<std::string>	validityCheck(unsigned int year, unsigned int month, unsigned int day) {
+void	validityCheck(unsigned int year, unsigned int month, unsigned int day) {
 	if (month < 1 || month > 12) {
-		return ("month must be in range: 1 - 12");
+		throw std::invalid_argument("month must be in range: 1 - 12");
 	}
 	if (day < 1 || day > 31) {
-		return ("day must be in range: 1 - 31");
+		throw std::invalid_argument("day must be in range: 1 - 31");
 	}
 	if (month == 2) {
 		if (day == 29 && !isLeapYear(year)) {
-			return ("february doesn't have 29 days in year " + std::to_string(year));
+			throw std::invalid_argument("february doesn't have 29 days in year " + std::to_string(year));
 		} else if (day > 29){
-			return ("february doesn't have " + std::to_string(day) + " days");
+			throw std::invalid_argument("february doesn't have " + std::to_string(day) + " days");
 		}
 	} else if (day > g_daysInMonth.at(month)) {
-			return ("month " + std::to_string(month) + " doesn't have 31 days");
+			throw std::invalid_argument("month " + std::to_string(month) + " doesn't have 31 days");
 	}
-	return (std::nullopt);
 }
 
 Date::Date(const std::string& date) {
@@ -50,12 +49,9 @@ Date::Date(const std::string& date) {
 		year_ = std::stoi(date.substr(0,4));
 		month_ = std::stoi(date.substr(5, 2));
 		day_ = std::stoi(date.substr(8));
+		validityCheck(year_, month_, day_);
 	} catch (std::exception &e) {
 		throw std::invalid_argument(std::string("invalid date: ") + e.what());
-	}
-	auto errMsg = validityCheck(year_, month_, day_);
-	if (errMsg.has_value()) {
-		throw std::invalid_argument("invalid date: " + errMsg.value());
 	}
 }
 
@@ -75,6 +71,10 @@ Date& Date::operator=(const Date& toAsgn) {
 Date::~Date() {
 }
 
+std::ostream& operator<<(std::ostream& os, const Date& date) {
+	os << date.getDate();
+	return (os);
+}
 
 std::string Date::decrementDate() {
 	if (day_ > 1) { 			// same month
@@ -90,15 +90,10 @@ std::string Date::decrementDate() {
 	return (getDate());
 }
 
-std::ostream& operator<<(std::ostream& os, const Date& date) {
-	os << date.getYear() << "-" << date.getMonth() << "-" << date.getDay();
-	return (os);
-}
 
 int Date::getYear() const { return year_; }
 int Date::getMonth() const { return month_; }
 int Date::getDay() const { return day_; }
-
 std::string Date::getDate() const {
 	std::ostringstream oss;
 	oss << year_
