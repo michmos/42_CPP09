@@ -90,6 +90,7 @@ std::ostream& operator<<(std::ostream& os, const Date& date) {
 	return (os);
 }
 
-inline int Date::getYear() const { return year_; }
-inline int Date::getMonth() const { return month_; }
-inline int Date::getDay() const { return day_; }
+int Date::getYear() const { return year_; }
+int Date::getMonth() const { return month_; }
+int Date::getDay() const { return day_; }
+
