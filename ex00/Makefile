@@ -5,6 +5,8 @@ SRC_DIR := src
 SRCS	:= main.cpp Date.cpp BtcConverter.cpp
 SRCS	:= $(addprefix $(SRC_DIR)/, $(SRCS))
 
+GTEST_DIR	:= ../googletest
+
 BUILD_DIR	:= .build
 OBJS		:= $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
 
@@ -20,6 +22,15 @@ endif
 RM		:= rm -rf
 
 all: $(NAME)
+
+run_tests: $(GTEST_DIR)/build
+
+$(GTEST_DIR)/build:
+	git submodule init
+	git submodule update
+	mkdir -p $@
+	cmake -B $@ $(GTEST_DIR)
+	$(MAKE) -C $@
 
 $(NAME): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $(NAME)
