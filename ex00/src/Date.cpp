@@ -82,6 +82,9 @@ std::string Date::decrementDate() {
 	} else if (month_ > 1) {	// last mont
 		month_--;
 		day_ = g_daysInMonth.at(month_);
+		if (month_ == 2 && isLeapYear(year_)) {
+			day_++;
+		}
 	} else {					// last year
 		year_--;
 		month_ = 12;
