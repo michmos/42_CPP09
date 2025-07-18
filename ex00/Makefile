@@ -1,11 +1,12 @@
 
+# ------------------------------------------------------------------#
+# Program variables													#
+# ------------------------------------------------------------------#
 NAME	:= btc
 
 SRC_DIR := src
 SRCS	:= main.cpp Date.cpp BtcConverter.cpp
 SRCS	:= $(addprefix $(SRC_DIR)/, $(SRCS))
-
-GTEST_DIR	:= ../googletest
 
 BUILD_DIR	:= .build
 OBJS		:= $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
@@ -21,16 +22,33 @@ ifeq ($(DEBUG), 1)
 endif
 RM		:= rm -rf
 
+# ------------------------------------------------------------------#
+# Gtest variables													#
+# ------------------------------------------------------------------#
+# set gtest dir
+GTEST_DIR		:= ../googletest/googletest
+GTEST_HEADERS 	= $(GTEST_DIR)/include/gtest/*.h \
+                  $(GTEST_DIR)/include/gtest/internal/*.h
+GTEST_SRCS_ 	= $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
+CPPFLAGS		+= -isystem $(GTEST_DIR)/include
+CFLAGS			+= -g
+# set test src dir
+TEST_SRC_DIR	:= $(SRC_DIR)/tests
+# set test build dir
+TEST_BUILD_DIR	:= $(BUILD_DIR)/tests
+# put your test source file names here
+TEST_SRCS		:= Date_test.cpp
+# construct full paths
+TEST_SRCS		:= $(TEST_SRCS:%.cpp=$(TEST_SRC_DIR)/%.cpp)
+TEST_OBJS		:= $(TEST_SRCS:$(TEST_SRC_DIR)/%.cpp=$(TEST_BUILD_DIR)/%.o)
+TESTS			=  $(basename $(TEST_OBJS))
+
+
+
+# ------------------------------------------------------------------#
+# Program build rules												#
+# ------------------------------------------------------------------#
 all: $(NAME)
-
-run_tests: $(GTEST_DIR)/build
-
-$(GTEST_DIR)/build:
-	git submodule init
-	git submodule update
-	mkdir -p $@
-	cmake -B $@ $(GTEST_DIR)
-	$(MAKE) -C $@
 
 $(NAME): $(OBJS)
 	$(CC) $(LDFLAGS) $(OBJS) -o $(NAME)
@@ -57,6 +75,39 @@ re:
 -include $(OBJS:.o=.d)
 
 .PHONY = all clean fclean re
+
+# ------------------------------------------------------------------#
+# GTest build rules													#
+# ------------------------------------------------------------------#
+
+tests: $(GTEST_DIR) $(TESTS)
+
+## General setup
+$(GTEST_DIR):
+	@if [ ! -d $@ ]; then \
+		git submodule init; \
+		git submodule update;\
+	fi
+
+# used to build gtest_main.o and gtest-all.o
+$(TEST_BUILD_DIR)/gtest%.o : $(GTEST_SRCS_) $(GTEST_DIR)
+	$(CC) $(CPPFLAGS) -I$(GTEST_DIR) $(CFLAGS) -c \
+            $(GTEST_DIR)/src/gtest$*.cc -o $@
+# create static library
+$(TEST_BUILD_DIR)/gtest.a : $(TEST_BUILD_DIR)/gtest-all.o
+	$(AR) $(ARFLAGS) $@ $^
+# create static library
+$(TEST_BUILD_DIR)/gtest_main.a : $(TEST_BUILD_DIR)/gtest-all.o $(TEST_BUILD_DIR)/gtest_main.o
+	$(AR) $(ARFLAGS) $@ $^
+
+# link test object and toTest object against static library with main
+$(TESTS) : $(TEST_BUILD_DIR)/%_test : $(TEST_BUILD_DIR)/%_test.o $(TEST_BUILD_DIR)/gtest_main.a $(BUILD_DIR)/%.o
+	$(CC) $(CFLAGS) $^ -o $@
+
+# create test object
+$(TEST_BUILD_DIR)/%.o: $(TEST_SRC_DIR)/%.cpp
+	@mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -c $^ -o $@
 
 
 # ----------------------------------- colors --------------------------------- #
