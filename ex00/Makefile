@@ -50,7 +50,7 @@ TESTS			=  $(basename $(TEST_OBJS))
 # ------------------------------------------------------------------#
 all: $(NAME)
 
-$(NAME): $(OBJS)
+$(NAME): $(OBJS) build_tests
 	$(CC) $(LDFLAGS) $(OBJS) -o $(NAME)
 	@printf "$(CREATED)" $@ $(CUR_DIR)
 
@@ -80,7 +80,7 @@ re:
 # GTest build rules													#
 # ------------------------------------------------------------------#
 
-tests: $(GTEST_DIR) $(TESTS)
+build_tests: $(GTEST_DIR) $(TESTS)
 
 ## General setup
 $(GTEST_DIR):
@@ -103,6 +103,7 @@ $(TEST_BUILD_DIR)/gtest_main.a : $(TEST_BUILD_DIR)/gtest-all.o $(TEST_BUILD_DIR)
 # link test object and toTest object against static library with main
 $(TESTS) : $(TEST_BUILD_DIR)/%_test : $(TEST_BUILD_DIR)/%_test.o $(TEST_BUILD_DIR)/gtest_main.a $(BUILD_DIR)/%.o
 	$(CC) $(CFLAGS) $^ -o $@
+	@printf "$(CREATED)" $@ $(CUR_DIR)
 
 # create test object
 $(TEST_BUILD_DIR)/%.o: $(TEST_SRC_DIR)/%.cpp
