@@ -1,4 +1,3 @@
-
 # ------------------------------------------------------------------#
 # Program variables													#
 # ------------------------------------------------------------------#
@@ -6,7 +5,7 @@ NAME	:= btc
 
 SRC_DIR := src
 SRCS	:= main.cpp Date.cpp BtcConverter.cpp
-SRCS	:= $(addprefix $(SRC_DIR)/, $(SRCS))
+SRCS	:= $(SRCS:%=$(SRC_DIR)/%)
 
 BUILD_DIR	:= .build
 OBJS		:= $(SRCS:$(SRC_DIR)/%.cpp=$(BUILD_DIR)/%.o)
@@ -30,14 +29,17 @@ GTEST_DIR		:= ../googletest/googletest
 GTEST_HEADERS 	= $(GTEST_DIR)/include/gtest/*.h \
                   $(GTEST_DIR)/include/gtest/internal/*.h
 GTEST_SRCS_ 	= $(GTEST_DIR)/src/*.cc $(GTEST_DIR)/src/*.h $(GTEST_HEADERS)
+
+OBJS_WO_MAIN	:= $(filter-out $(BUILD_DIR)/main.o, $(OBJS))
 CPPFLAGS		+= -isystem $(GTEST_DIR)/include
 CFLAGS			+= -g
+
 # set test src dir
 TEST_SRC_DIR	:= $(SRC_DIR)/tests
 # set test build dir
 TEST_BUILD_DIR	:= $(BUILD_DIR)/tests
 # put your test source file names here
-TEST_SRCS		:= Date_test.cpp
+TEST_SRCS		:= Date_test.cpp BtcConverter_test.cpp
 # construct full paths
 TEST_SRCS		:= $(TEST_SRCS:%.cpp=$(TEST_SRC_DIR)/%.cpp)
 TEST_OBJS		:= $(TEST_SRCS:$(TEST_SRC_DIR)/%.cpp=$(TEST_BUILD_DIR)/%.o)
@@ -79,7 +81,6 @@ re:
 # ------------------------------------------------------------------#
 # GTest build rules													#
 # ------------------------------------------------------------------#
-
 build_tests: $(GTEST_DIR) $(TESTS)
 
 ## General setup
@@ -101,7 +102,7 @@ $(TEST_BUILD_DIR)/gtest_main.a : $(TEST_BUILD_DIR)/gtest-all.o $(TEST_BUILD_DIR)
 	$(AR) $(ARFLAGS) $@ $^
 
 # link test object and toTest object against static library with main
-$(TESTS) : $(TEST_BUILD_DIR)/%_test : $(TEST_BUILD_DIR)/%_test.o $(TEST_BUILD_DIR)/gtest_main.a $(BUILD_DIR)/%.o
+$(TESTS) : $(TEST_BUILD_DIR)/%_test : $(TEST_BUILD_DIR)/%_test.o $(TEST_BUILD_DIR)/gtest_main.a $(OBJS_WO_MAIN)
 	$(CC) $(CFLAGS) $^ -o $@
 	@printf "$(CREATED)" $@ $(CUR_DIR)
 
@@ -109,6 +110,9 @@ $(TESTS) : $(TEST_BUILD_DIR)/%_test : $(TEST_BUILD_DIR)/%_test.o $(TEST_BUILD_DI
 $(TEST_BUILD_DIR)/%.o: $(TEST_SRC_DIR)/%.cpp
 	@mkdir -p $(dir $@)
 	$(CC) $(CPPFLAGS) $(CFLAGS) $(LDFLAGS) -c $^ -o $@
+
+print-%:
+	$(info $($*))
 
 
 # ----------------------------------- colors --------------------------------- #
