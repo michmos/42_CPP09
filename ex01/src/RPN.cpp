@@ -18,7 +18,7 @@ RPN::~RPN() {}
 // }
 
 float RPN::operator()(const std::string& polishMathExpression) {
-	if (!std::regex_match(polishMathExpression, std::regex("^[0-9](?: +(?:[0-9]|[*+\\-\\/]))*$"))) {
+	if (!std::regex_match(polishMathExpression, std::regex("^ *[0-9](?: +(?:[0-9]|[*+\\-\\/]))* *$"))) {
 		throw std::invalid_argument("invalid expression");
 	}
 
