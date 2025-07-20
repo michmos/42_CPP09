@@ -18,41 +18,49 @@ RPN::~RPN() {}
 // }
 
 float RPN::operator()(const std::string& polishMathExpression) {
-	if (!std::regex_match(polishMathExpression, std::regex("^[0-9](?: (?:[0-9]|[*+\\-\\/]))*$"))) {
+	if (!std::regex_match(polishMathExpression, std::regex("^[0-9](?: +(?:[0-9]|[*+\\-\\/]))*$"))) {
 		throw std::invalid_argument("invalid expression");
 	}
 
-	// std::stack<unsigned int> operands;
-	// auto performOperation = [&operands](std::function<int(int, int)> operate) {
-	// 	int op1 = operands.top(); operands.pop();
-	// 	int op2 = operands.top(); operands.pop();
-	// 	int result = operate(op2, op1);
-	// 	operands.push(result);
-	// 	// TODO: maybe should be float instead and then stack needs to account for that as well
-	// 	// TODO: check for size first 
-	// };
-	// for (char c : polishMathExpression) {
-	// 	switch (c) {
-	// 		case ' ':
-	// 			continue;
-	// 		case '+':
-	// 			performOperation([](int a, int b) { return(a + b);} );
-	// 			break;
-	// 		case '*':
-	// 			performOperation([](int a, int b) { return(a * b);} );
-	// 			break;
-	// 		case '-':
-	// 			performOperation([](int a, int b) { return(a - b);} );
-	// 			break;
-	// 		case '/':
-	// 			performOperation([](int a, int b) { return(a / b);} );
-	// 			break;
-	// 		default:
-	// 			break;
-	// 		// TODO: chek whether a b order is correct for - and /
-	// 	}
-	// }
-	// // TODO: chek whether stack size = 1
-	return (3.4);
-
+	std::stack<float> operands;
+	auto performOperation = [&operands](std::function<float(float, float)> operate) {
+		if (operands.size() < 2) {
+			throw std::logic_error("not enough operands available to perform operation");
+		}
+		float op1 = operands.top(); operands.pop();
+		float op2 = operands.top(); operands.pop();
+		float result = operate(op2, op1);
+		operands.push(result);
+	};
+	for (char c : polishMathExpression) {
+		switch (c) {
+			case ' ':
+				continue;
+			case '+':
+				performOperation([](int a, int b) { return(a + b);} );
+				break;
+			case '*':
+				performOperation([](int a, int b) { return(a * b);} );
+				break;
+			case '-':
+				performOperation([](int a, int b) { return(a - b);} );
+				break;
+			case '/':
+				performOperation([](int a, int b) { 
+					if (b == 0) {
+						throw std::logic_error("division by 0 not possible");
+					}
+					return(a / b);
+				} );
+				break;
+			default:
+				operands.push(c - '0');
+				break;
+		}
+	}
+	if (operands.size() > 1) {
+		throw std::logic_error("not enough operators provided");
+	}
+	return (operands.top());
 }
+
