@@ -37,16 +37,16 @@ float RPN::operator()(const std::string& polishMathExpression) {
 			case ' ':
 				continue;
 			case '+':
-				performOperation([](int a, int b) { return(a + b);} );
+				performOperation([](float a, float b) { return(a + b);} );
 				break;
 			case '*':
-				performOperation([](int a, int b) { return(a * b);} );
+				performOperation([](float a, float b) { return(a * b);} );
 				break;
 			case '-':
-				performOperation([](int a, int b) { return(a - b);} );
+				performOperation([](float a, float b) { return(a - b);} );
 				break;
 			case '/':
-				performOperation([](int a, int b) { 
+				performOperation([](float a, float b) { 
 					if (b == 0) {
 						throw std::logic_error("division by 0 not possible");
 					}
