@@ -18,6 +18,7 @@ TEST(invalidExpression, invalidChars) {
 	EXPECT_THROW(rpn("a 2 3"), std::invalid_argument);
 	EXPECT_THROW(rpn("1 a 3"), std::invalid_argument);
 	EXPECT_THROW(rpn("1 \\ 3"), std::invalid_argument);
+	EXPECT_THROW(rpn("(1 + 1)"), std::invalid_argument);
 }
 
 TEST(invalidExpression, emptyString) {
@@ -31,4 +32,16 @@ TEST(invalidExpression, startingWithOperator) {
 	EXPECT_THROW(rpn("* 3 3 +"), std::invalid_argument);
 	EXPECT_THROW(rpn("- 3 3 +"), std::invalid_argument);
 	EXPECT_THROW(rpn("/ 3 3 +"), std::invalid_argument);
+}
+
+TEST(validExpression, subjectTest) {
+	RPN rpn;
+	EXPECT_FLOAT_EQ(rpn("8 9 * 9 - 9 - 9 - 4 - 1 +"), 42);
+	EXPECT_FLOAT_EQ(rpn("7 7 * 7 -"), 42);
+	EXPECT_FLOAT_EQ(rpn("1 2 * 2 / 2 * 2 4 - +"), 0);
+}
+
+TEST(validExpression, multipleSpaces) {
+	RPN rpn;
+	EXPECT_FLOAT_EQ(rpn("8   9  * 9   - 9 - 9 - 4 - 1 +"), 42);
 }
