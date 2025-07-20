@@ -34,6 +34,24 @@ TEST(invalidExpression, startingWithOperator) {
 	EXPECT_THROW(rpn("/ 3 3 +"), std::invalid_argument);
 }
 
+TEST(invalidExpression, divisionByZero) {
+	RPN rpn;
+	EXPECT_THROW(rpn("3 3 3 - /"), std::logic_error);
+	EXPECT_THROW(rpn("4 0 /"), std::logic_error);
+}
+
+TEST(invalidExpression, notEnoughOperators) {
+	RPN rpn;
+	EXPECT_THROW(rpn("3 3 3 -"), std::logic_error);
+	EXPECT_THROW(rpn("4 0 2 + 5 6 2 -"), std::logic_error);
+}
+
+TEST(invalidExpression, notEnoughOperands) {
+	RPN rpn;
+	EXPECT_THROW(rpn("3 -"), std::logic_error);
+	EXPECT_THROW(rpn("4 2 + * /"), std::logic_error);
+}
+
 TEST(validExpression, subjectTest) {
 	RPN rpn;
 	EXPECT_FLOAT_EQ(rpn("8 9 * 9 - 9 - 9 - 4 - 1 +"), 42);
@@ -44,4 +62,19 @@ TEST(validExpression, subjectTest) {
 TEST(validExpression, multipleSpaces) {
 	RPN rpn;
 	EXPECT_FLOAT_EQ(rpn("8   9  * 9   - 9 - 9 - 4 - 1 +"), 42);
+	EXPECT_FLOAT_EQ(rpn("  8   9  * 9   - 9 - 9 - 4 - 1 +"), 42);
+	EXPECT_FLOAT_EQ(rpn("  8   9  * 9   - 9 - 9 - 4 - 1 +   "), 42);
+}
+
+TEST(validExpression, negativeResults) {
+	RPN rpn;
+	EXPECT_FLOAT_EQ(rpn("2 9 -"), -7);
+	EXPECT_FLOAT_EQ(rpn("2 9 - 9 - 9 -"), -25);
+}
+
+TEST(validExpression, floatResults) {
+	RPN rpn;
+	EXPECT_FLOAT_EQ(rpn("2 4 /"), 0.5);
+	EXPECT_FLOAT_EQ(rpn("2 8 /"), 0.25);
+	EXPECT_FLOAT_EQ(rpn("2 8 / 2 8 / +"), 0.5);
 }
