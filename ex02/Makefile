@@ -4,7 +4,7 @@
 NAME	:= PmergeMe
 
 SRC_DIR := src
-SRCS	:= main.cpp PmergeMe.cpp
+SRCS	:= main.cpp PmergeMe.cpp Element.cpp
 SRCS	:= $(SRCS:%=$(SRC_DIR)/%)
 
 BUILD_DIR	:= .build
