@@ -73,7 +73,7 @@ TEST_F(PMergeMeTest, swapElements3) {
 	EXPECT_TRUE(isEqual({0, 1, 2, 3, 4, 5, 6, 7}));
 }
 
-TEST_F(PMergeMeTest, outOfRange) {
+TEST_F(PMergeMeTest, swapElements_outOfRange) {
 	// B element is just not out of range
 	Element A = {1, 1};
 	Element B = {7, 1};
@@ -126,4 +126,17 @@ TEST_F(PMergeMeTest, moveElement_dontMove) {
 		}
 		FAIL() << "actual sequence: " << sequence;
 	}
+}
+
+TEST_F(PMergeMeTest, moveElement_moveToOutOfBounds) {
+	Element toMove = {0, 1}; // element 1 with size 2
+	ASSERT_TRUE(isEqual({0, 1, 2, 3, 4, 5, 6, 7}));
+	ASSERT_NO_THROW(pmerge.moveElement(toMove, 7));
+	EXPECT_THROW(pmerge.moveElement(toMove, 8), std::out_of_range); // move don't move
+}
+
+TEST_F(PMergeMeTest, moveElement_moveFromOutOfBounds) {
+	Element toMove = {8, 1}; // element 1 with size 2
+	ASSERT_TRUE(isEqual({0, 1, 2, 3, 4, 5, 6, 7}));
+	EXPECT_THROW(pmerge.moveElement(toMove, 0), std::out_of_range); // move don't move
 }
