@@ -22,11 +22,9 @@ public:
 
 	void				swapElements(Element A, Element B) noexcept(false);
 
-	// @brief	move element to a different position. All elements between its current and new position:
-	// - if moved to front: will be pushed one position back
-	// - if move to back: will be pushed one position to the front
-	// @param Element to move
-	// @param element idx defining new position
+	// @brief	move element to a different position. All elements between its current and the new position, including the new position will:
+	// - if element moved to front: will be pushed one position back
+	// - if element moved to back: will be pushed one position to the front
 	void				moveElement(Element toMove, size_t elmntInsrtIdx) noexcept(false);
 	std::vector<int>	getSequence() const noexcept;
 };

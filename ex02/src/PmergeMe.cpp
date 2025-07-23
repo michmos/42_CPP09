@@ -40,7 +40,7 @@ void	PmergeMe::moveElement(Element toMove, size_t elmntInsertionIdx) {
 	}
 
 	size_t	insertionPosition = elmntInsertionIdx * toMove.getSize();
-	if (toMove.endIdx() >= sequ_.size() || insertionPosition > sequ_.size()) {
+	if (toMove.endIdx() >= sequ_.size() || insertionPosition + toMove.getSize() - 1 > sequ_.size()) {
 		throw std::out_of_range("Element indices out of range");
 	}
 
