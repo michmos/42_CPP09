@@ -7,12 +7,8 @@
 
 class PmergeMe {
 private:
-	size_t			mainChainEndIdx_;	// idx where the main chain ends
-	size_t			pendStartIdx_;		// idx in sequ_ where the pend starts (= mainChainEndIdx_ + 1)
+	std::deque<int>	pend_;
 	std::deque<int>	sequ_;
-	// size_t			ignoredItemsIdx_;
-	
-	void			sort(std::size_t elementSize);
 
 public:
 	PmergeMe(int nums[], std::size_t size) noexcept;
@@ -20,12 +16,18 @@ public:
 	PmergeMe& operator=(const PmergeMe& toAsgn) = delete;
 	~PmergeMe() noexcept;
 
-	void				swapElements(Element A, Element B) noexcept(false);
+	size_t	getElmntInsrtnIdx(Element toInsrt, Element aCounterpart);
 
-	// @brief	move element to a different position. All elements between its current and the new position, including the new position will:
-	// - if element moved to front: will be pushed one position back
-	// - if element moved to back: will be pushed one position to the front
-	void				moveElement(Element toMove, size_t elmntInsrtIdx) noexcept(false);
+	void	sortElementPairs(size_t elmntSize, size_t numElements);
+	void	buildPend(size_t elmntSize, size_t numElements);
+	void	insrtPend(size_t elmntSize);
+
+	void	swapElements(Element A, Element B) noexcept(false);
+	void	addElementToPend(Element toAdd);
+	int		insrtElementFromPend(Element toInsrt, Element aCounterpart);
+
+	void	sort(std::size_t elementSize);
+
 	std::vector<int>	getSequence() const noexcept;
 };
 
