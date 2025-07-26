@@ -39,7 +39,7 @@ TEST_SRC_DIR	:= $(SRC_DIR)/tests
 # set test build dir
 TEST_BUILD_DIR	:= $(BUILD_DIR)/tests
 # put your test source file names here
-TEST_SRCS		:= PmergeMe_test.cpp
+TEST_SRCS		:= Element_test.cpp
 # construct full paths
 TEST_SRCS		:= $(TEST_SRCS:%.cpp=$(TEST_SRC_DIR)/%.cpp)
 TEST_OBJS		:= $(TEST_SRCS:$(TEST_SRC_DIR)/%.cpp=$(TEST_BUILD_DIR)/%.o)

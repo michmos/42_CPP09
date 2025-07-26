@@ -23,6 +23,10 @@ PmergeMe::~PmergeMe() noexcept {}
 // 	return (*this);
 // }
 
+
+
+// swaps to elements within sequ_
+// THROW if A or B are invalid ranges
 void	PmergeMe::swapElements(Element A, Element B) {
 	if (A.elIdx == B.elIdx) {
 		return; // no need to swap
@@ -34,21 +38,22 @@ void	PmergeMe::swapElements(Element A, Element B) {
 	std::swap_ranges(std::next(sequ_.begin(), A.startIdx()), std::next(sequ_.begin(), A.endIdx() + 1), std::next(sequ_.begin(), B.startIdx()));
 }
 
-void	PmergeMe::addElementToPend(Element toAdd) {
-	if (toAdd.endIdx() >= sequ_.size()) {
+// mv element toMove from sequ_ to the end of pend_
+void	PmergeMe::mvElementToPend(Element toMove) {
+	if (toMove.endIdx() >= sequ_.size()) {
 		throw std::out_of_range("Element indices out of range");
 	}
 
 	pend_.insert(pend_.end(),
-			  std::next(sequ_.begin(), toAdd.startIdx()), 
-			  std::next(sequ_.begin(), toAdd.endIdx() + 1));
-	sequ_.erase(std::next(sequ_.begin(), toAdd.startIdx()), 
-			 std::next(sequ_.begin(), toAdd.endIdx() + 1));
+			  std::next(sequ_.begin(), toMove.startIdx()), 
+			  std::next(sequ_.begin(), toMove.endIdx() + 1));
+	sequ_.erase(std::next(sequ_.begin(), toMove.startIdx()), 
+			 std::next(sequ_.begin(), toMove.endIdx() + 1));
 }
 
-// uses binary search to find the correct position where 
-// to insert the element toInsrt so that the sequence
-// stays ordered
+// returns the element Index where @toInsrt should be inserted in sequ_
+// using binary search
+// @aCounterpart serves as the right boundary of the search
 size_t	PmergeMe::getElmntInsrtnIdx(Element toInsrt, Element aCounterpart) {
 	size_t elSize = toInsrt.getSize();
 	int insrtValue = pend_[toInsrt.endIdx()];
@@ -73,6 +78,10 @@ size_t	PmergeMe::getElmntInsrtnIdx(Element toInsrt, Element aCounterpart) {
 	return (left.elIdx);
 }
 
+// inserts the element @toInsrt which should be referring to pend_ into
+// sequ_. 
+// @aCounterpart serves as a boundary for binary search.
+// The element is NOT removed from pend_
 int	PmergeMe::insrtElementFromPend(Element toInsrt, Element aCounterpart) {
 	size_t elmntInsertionIdx = getElmntInsrtnIdx(toInsrt, aCounterpart);
 	size_t insertionPosition = elmntInsertionIdx * toInsrt.getSize();
@@ -92,58 +101,72 @@ void	PmergeMe::sortElementPairs(size_t elmntSize, size_t numElements) {
 	}
 }
 
+// moves b elements starting from b2 from sequ_ to pend_
 void	PmergeMe::buildPend(size_t elmntSize, size_t numElements) {
-	// elements are in the following order: b1 a1 b2 a2
-	// move b elements to pend starting with b2 (which is at index 2),
 	Element b(2, elmntSize);
 	for (; b.elIdx < numElements; ++b.elIdx, --numElements) {
-		addElementToPend(b); // TODO: rename to move
+		mvElementToPend(b);
 	}
+}
+
+// given previous insertions and current bLable, determines where the counterpart a elements is located
+// and returns this - so for b2 -> a2 etc.
+static Element	getACounterpart(const std::vector<int>& elmntInsrtIdxCount, size_t bLable, size_t elmntSize) {
+	Element aCounterpart(bLable, elmntSize);
+	for (int e = 0; e <= aCounterpart.elIdx; ++e) {
+		aCounterpart.elIdx += elmntInsrtIdxCount[e];
+	}
+	return (aCounterpart);
+}
+
+// assumes that currNum and lastNum are valid jacobsthal nums
+// applies jacobsthal formula to update both variables
+static void	updateJacobsthalNums(unsigned int& currNum, unsigned int& lastNum) {
+	unsigned int tmp = currNum;;
+	currNum += 2 * lastNum;
+	lastNum = tmp;
 }
 
 void	PmergeMe::insrtPend(size_t elmntSize) {
-	std::vector<int> elmntInsrtIdxCount(sequ_.size() + pend_.size(), 0);
+	unsigned int 	lstJTNum = 1;
+	unsigned int 	currJTNum = 3;
+	size_t 			bLable = currJTNum;
 
-	unsigned int lstJacobsthalNum = 1;
-	unsigned int currJacobsthalNum = 3;
-	size_t	elementsToInsert = pend_.size() / elmntSize;
+	std::vector<int> eInsrtIdxCount(sequ_.size() + pend_.size(), 0);
+	for (size_t numElmntsToInsert = pend_.size() / elmntSize; numElmntsToInsert > 0; --numElmntsToInsert, --bLable) {
+		if (bLable == lstJTNum) {
+			updateJacobsthalNums(currJTNum, lstJTNum);
 
-	size_t bLable = currJacobsthalNum;
-	for (; elementsToInsert > 0; --elementsToInsert, --bLable) {
-		if (bLable == lstJacobsthalNum) {	// update Jacobsthal number
-			unsigned int tmp = currJacobsthalNum;
-			currJacobsthalNum += 2 * lstJacobsthalNum;
-			lstJacobsthalNum = tmp;
-			bLable = currJacobsthalNum;
-			if (lstJacobsthalNum + elementsToInsert < currJacobsthalNum) {
-				bLable = lstJacobsthalNum + elementsToInsert;
+			bLable = currJTNum;
+			if (lstJTNum + numElmntsToInsert < currJTNum) {
+				bLable = lstJTNum + numElmntsToInsert;
 			}
 		}
 		Element toInsrt(bLable - 2, elmntSize);
-		Element aCounterpart(bLable, elmntSize);
-		for (int e = 0; e <= aCounterpart.elIdx; ++e) {
-			aCounterpart.elIdx += elmntInsrtIdxCount[e];
-		}
-		size_t elmntInsrtIdx = insrtElementFromPend(toInsrt, aCounterpart);
-		elmntInsrtIdxCount[elmntInsrtIdx]++;
+		Element aCounterpart = getACounterpart(eInsrtIdxCount, bLable, elmntSize);
+
+		size_t eInsrtIdx = insrtElementFromPend(toInsrt, aCounterpart);
+		eInsrtIdxCount[eInsrtIdx]++;
 	}
 }
 
-void	PmergeMe::sort(std::size_t elmntSize) {
+void	PmergeMe::recSort(std::size_t elmntSize) {
 	size_t numElements = sequ_.size() / elmntSize;
 	if (numElements < 2) {	// basecase
 		return;
 	}
 	sortElementPairs(elmntSize, numElements);	// step 1
 
-	sort(elmntSize * 2);
+	recSort(elmntSize * 2);
 
 	buildPend(elmntSize, numElements);			// step 2
 	insrtPend(elmntSize);						// step 3
 	pend_.clear();
 }
 
-
+void	PmergeMe::sort() {
+	recSort(1);
+}
 
 std::vector<int>	PmergeMe::getSequence() const noexcept {
 	return std::vector<int>(sequ_.begin(), sequ_.end());
