@@ -166,6 +166,9 @@ void	PmergeMe::recSort(std::size_t elmntSize) {
 }
 
 void	PmergeMe::sort() {
+	if (sequ_.size() < 2) {
+		return; // nothing to sort
+	}
 	recSort(1);
 }
 
