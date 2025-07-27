@@ -1,5 +1,9 @@
 #include "../inc/PmergeMe.hpp"
 #include <iostream>
+#include <stack>
+#include <unordered_set>
+
+
 
 int	main(void) {
 	std::vector<int> vec = 
@@ -7,9 +11,9 @@ int	main(void) {
 		8, 6, 15, 10, 3,
 		21, 1,18, 9, 14, 
 		19, 12, 5,4, 20, 13, 7};
-	PmergeMe pmerge(vec.data(), vec.size());
+	PmergeMe<std::vector<int>> pmerge(vec.data(), vec.size());
 	pmerge.sort();
-	std::vector<int> result = pmerge.getSequence();
+	auto result = pmerge.getSequence();
 	for (auto el : result) {
 		std::cout << el << " ";
 	}

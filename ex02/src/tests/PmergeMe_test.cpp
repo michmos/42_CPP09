@@ -5,7 +5,7 @@
 #include "../../inc/PmergeMe.hpp"
 
 void	testSort(std::vector<int> vecToSort) {
-	PmergeMe pm(vecToSort.data(), vecToSort.size());
+	PmergeMe<std::vector<int>> pm(vecToSort.data(), vecToSort.size());
 	pm.sort();
 	auto res = pm.getSequence();
 	std::sort(vecToSort.begin(), vecToSort.end());
@@ -15,7 +15,6 @@ void	testSort(std::vector<int> vecToSort) {
 		FAIL();
 	}
 }
-
 
 TEST(PmergeMe, evenNumElements_unique) {
 	std::vector<int> vec = {4, 3, 2, 1};
