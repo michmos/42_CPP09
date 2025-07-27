@@ -10,6 +10,62 @@ private:
 	Container	pend_;
 	Container	sequ_;
 
+	//--------------------------------------------------------------------
+	// stage 1: presorting elements
+	//--------------------------------------------------------------------
+
+	// swaps to elements within sequ_
+	// THROW if A or B are invalid ranges
+	void	swapElements(Element A, Element B) noexcept(false) {
+		if (A.elIdx == B.elIdx) {
+			return; // no need to swap
+		}
+		if (A.endIdx() >= sequ_.size() || B.endIdx() >= sequ_.size()) {
+			throw std::out_of_range("Element indices out of range");
+		}
+
+		std::swap_ranges(std::next(sequ_.begin(), A.startIdx()), std::next(sequ_.begin(), A.endIdx() + 1), std::next(sequ_.begin(), B.startIdx()));
+	}
+
+
+	void	sortElementPairs(size_t elmntSize, size_t numElements) {
+		Element left(0, elmntSize), right(1, elmntSize);
+		for (; right.elIdx < numElements; right.elIdx+=2, left.elIdx+=2) {
+			if (sequ_[left.endIdx()] > sequ_[right.endIdx()]) {
+				swapElements(left, right);
+			}
+		}
+	}
+
+	//--------------------------------------------------------------------
+	// stage 2: build pend
+	//--------------------------------------------------------------------
+
+	// mv element toMove from sequ_ to the end of pend_
+	void	mvElementToPend(Element toMove) {
+		if (toMove.endIdx() >= sequ_.size()) {
+			throw std::out_of_range("Element indices out of range");
+		}
+
+		pend_.insert(pend_.end(),
+				std::next(sequ_.begin(), toMove.startIdx()), 
+				std::next(sequ_.begin(), toMove.endIdx() + 1));
+		sequ_.erase(std::next(sequ_.begin(), toMove.startIdx()), 
+				std::next(sequ_.begin(), toMove.endIdx() + 1));
+	}
+
+	// moves b elements starting from b2 from sequ_ to pend_
+	void	buildPend(size_t elmntSize, size_t numElements) {
+		Element b(2, elmntSize);
+		for (; b.elIdx < numElements; ++b.elIdx, --numElements) {
+			mvElementToPend(b);
+		}
+	}
+
+	//--------------------------------------------------------------------
+	// stage 3: insert pend
+	//--------------------------------------------------------------------
+
 	// returns the element Index where @toInsrt should be inserted in sequ_
 	// using binary search
 	// @aCounterpart serves as the right boundary of the search
@@ -37,19 +93,6 @@ private:
 		return (left.elIdx);
 	}
 
-	// swaps to elements within sequ_
-	// THROW if A or B are invalid ranges
-	void	swapElements(Element A, Element B) noexcept(false) {
-		if (A.elIdx == B.elIdx) {
-			return; // no need to swap
-		}
-		if (A.endIdx() >= sequ_.size() || B.endIdx() >= sequ_.size()) {
-			throw std::out_of_range("Element indices out of range");
-		}
-
-		std::swap_ranges(std::next(sequ_.begin(), A.startIdx()), std::next(sequ_.begin(), A.endIdx() + 1), std::next(sequ_.begin(), B.startIdx()));
-	}
-
 	// inserts the element @toInsrt which should be referring to pend_ into
 	// sequ_. 
 	// @aCounterpart serves as a boundary for binary search.
@@ -63,37 +106,6 @@ private:
 				std::next(pend_.begin(), toInsrt.endIdx()+ 1));
 		return (elmntInsertionIdx);
 	}
-
-	void	sortElementPairs(size_t elmntSize, size_t numElements) {
-		Element left(0, elmntSize), right(1, elmntSize);
-		for (; right.elIdx < numElements; right.elIdx+=2, left.elIdx+=2) {
-			if (sequ_[left.endIdx()] > sequ_[right.endIdx()]) {
-				swapElements(left, right);
-			}
-		}
-	}
-
-	// mv element toMove from sequ_ to the end of pend_
-	void	mvElementToPend(Element toMove) {
-		if (toMove.endIdx() >= sequ_.size()) {
-			throw std::out_of_range("Element indices out of range");
-		}
-
-		pend_.insert(pend_.end(),
-				std::next(sequ_.begin(), toMove.startIdx()), 
-				std::next(sequ_.begin(), toMove.endIdx() + 1));
-		sequ_.erase(std::next(sequ_.begin(), toMove.startIdx()), 
-				std::next(sequ_.begin(), toMove.endIdx() + 1));
-	}
-
-	// moves b elements starting from b2 from sequ_ to pend_
-	void	buildPend(size_t elmntSize, size_t numElements) {
-		Element b(2, elmntSize);
-		for (; b.elIdx < numElements; ++b.elIdx, --numElements) {
-			mvElementToPend(b);
-		}
-	}
-
 
 	static Element	getACounterpart(const std::vector<int>& elmntInsrtIdxCount, size_t bLable, size_t elmntSize) {
 		Element aCounterpart(bLable, elmntSize);
@@ -135,6 +147,10 @@ private:
 		}
 	}
 
+	//--------------------------------------------------------------------
+	// general sorting algorithm
+	//--------------------------------------------------------------------
+
 	void	recSort(std::size_t elmntSize) {
 		size_t numElements = sequ_.size() / elmntSize;
 		if (numElements < 2) {	// basecase
@@ -155,16 +171,14 @@ public:
 			sequ_.push_back(nums[i]);
 		}
 	}
-
 	PmergeMe(const PmergeMe& toCopy) = delete;
 	PmergeMe& operator=(const PmergeMe& toAsgn) = delete;
-
 	~PmergeMe() noexcept {}
 
 	void	sort() {
-		if (sequ_.size() < 2) {
-				return; // nothing to sort
-			}
+		if (sequ_.size() < 2) {		// nothing to sort
+			return;
+		}
 		recSort(1);
 	}
 

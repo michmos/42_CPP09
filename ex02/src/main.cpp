@@ -56,8 +56,8 @@ int	main(int argc, char *argv[]) {
 		auto vecResult = pmVec.getSequence();
 		auto deqResult = pmDeq.getSequence();
 
-		// compare sorted container
-		if (vecResult.size() != deqResult.size() 
+		// check that results are equal
+		if ((vecResult.size() != deqResult.size())
 			|| !std::equal(vecResult.begin(), vecResult.end(), deqResult.begin(), deqResult.end())) {
 			throw std::logic_error("vector result and deque result differ");
 		}
