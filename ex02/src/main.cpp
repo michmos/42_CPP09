@@ -7,7 +7,7 @@
 std::vector<int> parseInput(char *nums[]) {
 	std::vector<int> vec;
 	for (int i = 0; nums[i]; ++i) {
-		if (!std::regex_match(nums[i], std::regex("^-?[0-9]+$"))) {
+		if (!std::regex_match(nums[i], std::regex("^[0-9]+$"))) {
 			throw std::invalid_argument("Invalid element: " + std::string(nums[i]));
 		}
 		
