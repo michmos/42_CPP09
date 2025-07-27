@@ -168,7 +168,7 @@ public:
 		recSort(1);
 	}
 
-	inline Container	getSequence() const noexcept {
+	inline const Container&	getSequence() const noexcept {
 		return sequ_;
 	}
 };
