@@ -130,10 +130,11 @@ static void	updateJacobsthalNums(unsigned int& currNum, unsigned int& lastNum) {
 void	PmergeMe::insrtPend(size_t elmntSize) {
 	unsigned int 	lstJTNum = 1;
 	unsigned int 	currJTNum = 3;
-	size_t 			bLable = currJTNum;
+	size_t numElmntsToInsert = pend_.size() / elmntSize;
+	size_t 			bLable = (numElmntsToInsert > 1) ? 3 : 2;
 
 	std::vector<int> eInsrtIdxCount(sequ_.size() + pend_.size(), 0);
-	for (size_t numElmntsToInsert = pend_.size() / elmntSize; numElmntsToInsert > 0; --numElmntsToInsert, --bLable) {
+	for (; numElmntsToInsert > 0; --numElmntsToInsert, --bLable) {
 		if (bLable == lstJTNum) {
 			updateJacobsthalNums(currJTNum, lstJTNum);
 
