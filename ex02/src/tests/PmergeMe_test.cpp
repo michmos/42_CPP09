@@ -1,6 +1,7 @@
 
 #include <climits>
 #include <gtest/gtest.h>
+#include <random>
 #include "../../inc/PmergeMe.hpp"
 
 void	testSort(std::vector<int> vecToSort) {
@@ -52,6 +53,35 @@ TEST(PmergeMe, withDuplicates) {
 	vec = {5, 5, 5, 5, 5};
 	testSort(vec);
 	vec = {INT_MIN, INT_MIN, INT_MAX, INT_MAX, 0, 0};
+	testSort(vec);
+}
+
+TEST(PmergeMe, singleElement) {
+	std::vector<int> vec = {2};
+	testSort(vec);
+}
+
+TEST(PmergeMe, emptyArray) {
+	std::vector<int> vec = {};
+	testSort(vec);
+}
+
+TEST(PmergeMe, thousandElements_unsorted) {
+		std::vector<int> vec;
+	for (int i = 0; i < 1000; ++i) {
+		vec.push_back(i * 3 - 100); // unique values
+	}
+	std::random_device rd;
+	std::mt19937 g(rd());
+	std::shuffle(vec.begin(), vec.end(), g);
+	testSort(vec);
+}
+
+TEST(PmergeMe, thousandElements_sorted) {
+		std::vector<int> vec;
+	for (int i = 0; i < 1000; ++i) {
+		vec.push_back(i); // unique values
+	}
 	testSort(vec);
 }
 
