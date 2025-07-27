@@ -51,7 +51,7 @@ TEST(PmergeMe, withDuplicates) {
 	testSort(vec);
 	vec = {5, 5, 5, 5, 5};
 	testSort(vec);
-	vec = {INT_MIN, INT_MIN, INT_MAX, INT_MAX, 0, 0};
+	vec = {INT_MIN, INT_MAX, INT_MAX, INT_MIN, 0, 0};
 	testSort(vec);
 }
 
@@ -65,9 +65,9 @@ TEST(PmergeMe, emptyArray) {
 	testSort(vec);
 }
 
-TEST(PmergeMe, thousandElements_unsorted) {
+TEST(PmergeMe, threeThousandElements_unsorted) {
 		std::vector<int> vec;
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 3000; ++i) {
 		vec.push_back(i * 3 - 100); // unique values
 	}
 	std::random_device rd;
@@ -76,12 +76,11 @@ TEST(PmergeMe, thousandElements_unsorted) {
 	testSort(vec);
 }
 
-TEST(PmergeMe, thousandElements_sorted) {
+TEST(PmergeMe, threeThousandElements_sorted) {
 		std::vector<int> vec;
-	for (int i = 0; i < 1000; ++i) {
+	for (int i = 0; i < 3000; ++i) {
 		vec.push_back(i); // unique values
 	}
 	testSort(vec);
 }
-
 
