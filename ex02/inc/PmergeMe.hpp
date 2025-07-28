@@ -167,7 +167,6 @@ private:
 
 public:
 	PmergeMe(int nums[], std::size_t size) noexcept {
-		sequ_.reserve(size);
 		for (std::size_t i = 0; i < size; ++i) {
 			sequ_.push_back(nums[i]);
 		}
