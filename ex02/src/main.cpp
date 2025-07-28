@@ -1,6 +1,7 @@
 #include "../inc/PmergeMe.hpp"
 #include <chrono>
 #include <iostream>
+#include <list>
 #include <regex>
 #include <stdexcept>
 
@@ -45,27 +46,27 @@ int	main(int argc, char *argv[]) {
 		auto end = std::chrono::high_resolution_clock::now();
 		auto vecDuration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
-		// sort with deque
+		// sort with list
 		start = std::chrono::high_resolution_clock::now();
-		PmergeMe<std::deque<int>> pmDeq(vec.data(), vec.size());
-		pmDeq.sort();
+		PmergeMe<std::list<int>> pmList(vec.data(), vec.size());
+		pmList.sort();
 		end = std::chrono::high_resolution_clock::now();
-		auto deqDuration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+		auto listDuration = std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
 		// get sorted containers
 		auto vecResult = pmVec.getSequence();
-		auto deqResult = pmDeq.getSequence();
+		auto listResult = pmList.getSequence();
 
 		// check that results are equal
-		if ((vecResult.size() != deqResult.size())
-			|| !std::equal(vecResult.begin(), vecResult.end(), deqResult.begin(), deqResult.end())) {
-			throw std::logic_error("vector result and deque result differ");
+		if ((vecResult.size() != listResult.size())
+			|| !std::equal(vecResult.begin(), vecResult.end(), listResult.begin(), listResult.end())) {
+			throw std::logic_error("vector result and listue result differ");
 		}
 
 		// print results
 		std::cout << "After: " << vecToString(vecResult) << std::endl;
 		std::cout << "Time to process a range of " << vec.size() << " elements with std::vector<int>: " << vecDuration << " us" << std::endl;
-		std::cout << "Time to process a range of " << vec.size() << " elements with std::deque<int>: " << deqDuration << " us" << std::endl;
+		std::cout << "Time to process a range of " << vec.size() << " elements with std::list<int>: " << listDuration << " us" << std::endl;
 
 	} catch (std::exception& e) {
 		std::cerr << "Error occurred: " << e.what() << std::endl;

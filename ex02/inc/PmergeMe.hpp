@@ -31,7 +31,7 @@ private:
 	void	sortElementPairs(size_t elmntSize, size_t numElements) {
 		Element left(0, elmntSize), right(1, elmntSize);
 		for (; right.elIdx < numElements; right.elIdx+=2, left.elIdx+=2) {
-			if (sequ_[left.endIdx()] > sequ_[right.endIdx()]) {
+			if (*std::next(sequ_.begin(), left.endIdx()) > *std::next(sequ_.begin(), right.endIdx())) {
 				swapElements(left, right);
 			}
 		}
@@ -71,7 +71,7 @@ private:
 	// @aCounterpart serves as the right boundary of the search
 	size_t	getElmntInsrtnIdx(Element toInsrt, Element aCounterpart) {
 		size_t elSize = toInsrt.getSize();
-		int insrtValue = pend_[toInsrt.endIdx()];
+		int insrtValue = *std::next(pend_.begin(), toInsrt.endIdx());
 		size_t numElements = sequ_.size() / elSize;
 
 		Element left({0, elSize});
@@ -84,7 +84,7 @@ private:
 		while (left.elIdx < right.elIdx) {
 			Element mid({(left.elIdx + right.elIdx) / 2, elSize});
 
-			if (insrtValue < sequ_[mid.endIdx()]) {
+			if (insrtValue < *std::next(sequ_.begin(), mid.endIdx())) {
 				right.elIdx = mid.elIdx;
 			} else {
 				left.elIdx = mid.elIdx + 1;
