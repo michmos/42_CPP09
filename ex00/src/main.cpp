@@ -15,9 +15,7 @@ void printInputError(size_t lineNbr, const std::string& str) {
 	std::cerr << RED << "Error in line: " << lineNbr << ": " << str << RESET << std::endl;
 }
 
-float getValue(const std::string& validationDate, const std::string& amount) {
-	static BtcConverter converter(CSV_PATH);
-
+float getValue(const std::string& validationDate, const std::string& amount, BtcConverter& converter) {
 	// create Date object as validity check
 	Date date(validationDate);
 
@@ -50,6 +48,8 @@ int main(int argc, char* argv[]) {
 		if (inputFile.fail()) {
 			throw std::invalid_argument("Couldn't open file: " + std::string(argv[1]) + ": " + strerror(errno));
 		}
+		// init converter with csv
+		BtcConverter converter(CSV_PATH);
 
 		std::string line;
 		for (size_t lineNbr = 0; std::getline(inputFile, line); ++lineNbr) {
@@ -64,7 +64,7 @@ int main(int argc, char* argv[]) {
 
 			// get total value
 			try {
-				float value = getValue(match[1], match[2]);
+				float value = getValue(match[1], match[2], converter);
 				std::cout << match[1] << " => " << match[2] << " => " << value << std::endl;
 			} catch (std::exception &e) {
 				printInputError(lineNbr, e.what());
